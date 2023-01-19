@@ -99,9 +99,9 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [frontend-build]
       - run: 
-          name: scan-backend
+          name: scan-frontend
           command: |
             cd backend
             npm audit --audit-level=critical     

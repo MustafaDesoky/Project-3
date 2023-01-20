@@ -10,7 +10,7 @@ commands:
     parameters:
       workflow_id:
         type: string
-        # default: ${CIRCLECI_WORKFLOW_ID}
+        # default: ${CIRCLE_WORKFLOW_ID}
       workflow_s3:
         type: string
         default: s3bucmustafa    
@@ -174,7 +174,7 @@ jobs:
           command: |
             echo $(aws ec2 describe-instances \
             --query 'Reservation[*].Instances[*].PublicIpAddress' \
-            --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend${CIRCLECI_WORKFLOW_ID:0:7} \
+            --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend${CIRCLE_WORKFLOW_ID:0:7} \
             --output text) >> ~/project/.circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
@@ -182,7 +182,7 @@ jobs:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure  
       - destroy-environment:
-          workflow_id: ${CIRCLECI_WORKFLOW_ID:0:7}
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - slack/notify: # you can add this job at any of your jobs to notify on slackk
           event: fail
           mentions: '@EngineeringTeam'

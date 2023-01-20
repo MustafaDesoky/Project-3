@@ -189,24 +189,32 @@ jobs:
           template: basic_fail_1       
 
 
-  # configure-infrastructure:
-  #   docker:
-  #     # Docker image here that supports Ansible
-  #   steps:
-  #     # Checkout code from git
-  #     # Add ssh keys with fingerprint
-  #     # attach workspace
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     # Here's where you will add some code to rollback on failure      
+  configure-infrastructure:
+    docker:
+      - image: python3.7-alpine
+    steps:
+      - checkout
+      - add_ssh_keys:
+          # You can get this ID in the section where you registered the SSH Key
+          fingerprints: ["d0:8e:91:0b:04:af:af:a3:4a:c5:81:ac:d4:44:05:68"]
+      - run:
+          name: Install Ansible
+          # apk add --update --on-cache tar gzip ansible awscli
+          command: |
+            pip install ansible   
+      - attach_workspace:
+          at: ~/      
+      - run:
+          name: run Ansible
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml 
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - slack/notify: # you can add this job at any of your jobs to notify on slackk
+          event: fail
+          mentions: '@EngineeringTeam'
+          template: basic_fail_1             
 
   # run-migrations:
   #   docker:

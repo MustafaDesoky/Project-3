@@ -93,9 +93,9 @@ jobs:
           command: | 
             cd frontend
             npm run test
-      - slack/notify:   # you can add this job at any of your jobs to notify on slack
-          event: pass
-          template: success_tagged_deploy_1          
+      # - slack/notify:   # you can add this job at any of your jobs to notify on slack
+      #     event: pass
+      #     template: success_tagged_deploy_1          
   test-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -150,9 +150,9 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      # - run: 
-      #     command: |
-      #       yum install -y tar -gzip
+      - run: 
+          command: |
+            yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -183,6 +183,10 @@ jobs:
       # Here's where you will add some code to rollback on failure  
       - destroy-environment:
           workflow_id: ${CIRCLECI_WORKFLOW_ID:0:7}
+      - slack/notify: # you can add this job at any of your jobs to notify on slackk
+          event: fail
+          mentions: '@EngineeringTeam'
+          template: basic_fail_1       
 
 
   # configure-infrastructure:

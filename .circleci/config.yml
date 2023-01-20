@@ -200,7 +200,7 @@ jobs:
       - run:
           name: Install Ansible
           command: |
-            apk add --update --on-cache tar gzip 
+            apk add --update --no-cache tar gzip 
             pip install ansible awscli      
       - run:
           name: run Ansible

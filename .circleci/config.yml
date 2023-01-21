@@ -365,7 +365,7 @@ jobs:
             --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-            if curl -s "${API_URL}/api/status"
+            if curl "${API_URL}/api/status"
             then
               echo "backend is working successfully"
               exit 0
@@ -377,7 +377,7 @@ jobs:
           command: |
             URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees"            
             echo ${URL} 
-            if curl -s ${URL} | grep "Welcome"
+            if curl ${URL} | grep "Welcome"
             then
               echo "Frontend is working successfully"
               exit 1
@@ -501,9 +501,9 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update
-          # requires: [smoke-test]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]

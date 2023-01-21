@@ -199,7 +199,8 @@ jobs:
           name: Install Ansible
           command: |
             apk add --update --no-cache tar gzip 
-            pip install ansible awscli      
+            pip install ansible awscli
+            apk add openssh-client      
       - run:
           name: run Ansible
           command: |

@@ -332,17 +332,7 @@ jobs:
             mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz 
             cd ./.circleci/ansible
             echo "Content of inventory file is -----$(cat inventory.txt)"
-            ansible-playbook -i inventory.txt deploy-backend.yml 
-      # - run:
-      #     name: Deploy backend
-      #     command: | 
-      #       export TYPEORM_MIGRATIONS_DIR=./migrations
-      #       export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-      #       export TYPEORM_MIGRATIONS=./migrations/*.ts
-      #       cd .circleci/ansible
-      #       echo "Contents  of the inventory.txt file is ------"
-      #       cat inventory.txt
-      #       ansible-playbook -i inventory.txt deploy-backend.yml    
+            ansible-playbook -i inventory.txt deploy-backend.yml   
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations  
@@ -378,9 +368,9 @@ jobs:
             if curl -s "${API_URL}/api/status" | grep "ok"
             then
               echo "backend is working successfully"
-              exit 0
+              return 0
             else
-              exit 1
+              return 1
             fi
       - run:
           name: Frontend smoke test.
@@ -390,9 +380,9 @@ jobs:
             if curl -s ${URL} | grep "Welcome"
             then
               echo "Frontend is working successfully"
-              exit 1
+              return 0
             else
-              exit 1
+              return 1
             fi
       # Here's where you will add some code to rollback on failure  
       - destroy-environment:

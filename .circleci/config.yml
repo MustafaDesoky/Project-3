@@ -355,7 +355,7 @@ jobs:
             sudo n 13.8.0
       # - attach_workspace:
       #     at: ~/
-      # export BACKEND_IP=$(tail ~/project/.circleci/ansible/inventory.txt)    
+      # export BACKEND_IP=$(tail ~/project/.circleci/ansible/inventory.txt) another way to get IPs   
       - run:
           name: Backend smoke test.
           command: |
@@ -380,7 +380,7 @@ jobs:
             if curl -s ${URL} | grep "Welcome"
             then
               echo "Frontend is working successfully"
-              return 0
+              return 1
             else
               return 1
             fi

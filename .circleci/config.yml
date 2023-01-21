@@ -302,8 +302,7 @@ jobs:
             - "d0:8e:91:0b:04:af:af:a3:4a:c5:81:ac:d4:44:05:68"   
       - run:
           name: Install dependencies
-          command: |
-            
+          command: |  
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
@@ -327,8 +326,8 @@ jobs:
             cd backend
             npm install
             npm run build
-            tar -czf artifact.tar.gz dist/* package*
             cd ..
+            tar -czf artifact.tar.gz dist/* package*
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
           name: Deploy backend
@@ -340,7 +339,6 @@ jobs:
             echo "Contents  of the inventory.txt file is ------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml    
-
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations  

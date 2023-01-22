@@ -430,7 +430,7 @@ jobs:
       - run:
           name: Remove old stacks and files
           command: |
-            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+            if [["${STACKS[@]}" =~ "${OldWorkflowID}"]]
             then
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
@@ -460,18 +460,18 @@ jobs:
   #           echo Current_CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
   #           export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-  #                   --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+  #           --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
   #           echo Stack names: "${STACKS[@]}"       
             
 
   #           if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
   #           then
-  #             echo "------------------ Deleting old Envirments ------------------"
+  #             echo "delete  old Env"
   #             aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
   #             aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
   #             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
   #           else
-  #             echo "------------------ Nothing to Delete/Can't Delete ------------------"  
+  #             echo "nothing to be deleted"  
   #           fi
             
 ############################# WORKFLOWS ######################################

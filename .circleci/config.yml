@@ -1,7 +1,12 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@4.12.1   
+  slack: circleci/slack@4.12.1 
+
+parameters:
+  workflow_id:
+    type: string
+    default: '${CIRCLE_WORKFLOW_ID}'    
 
 commands:
 
@@ -169,6 +174,7 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             IP_ADDRESS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[].Instances[].PublicIpAddress' --output text)
+            echo IP_ADDRESS= "${IP_ADDRESS}"
             echo $IP_ADDRESS >> ./.circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
@@ -365,7 +371,7 @@ jobs:
             --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-            if curl -s "${API_URL}/api/status"
+            if curl -s "${API_URL}/api/status" | grep "ok"
             then
               echo "backend is working successfully"
               exit 0
@@ -397,13 +403,17 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum install -y npm nodejs
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       - run:
           name: Update cloudfront distribution
           command: |
             export OldWorkflowID=$(aws cloudformation \
             list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
             --no-paginate --output text)
+
+            echo OldWorkflowID: "${OldWorkflowID}"
 
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
@@ -425,8 +435,11 @@ jobs:
           command: |
             # your code here
             export OldWorkflowID=<<pipline.parameters.workflow_id>>
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
             --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+            echo Stack names: "${STACKS[@]}"
       - run:
           name: Remove old stacks and files
           command: |
@@ -438,42 +451,6 @@ jobs:
             fi
 
 
-  # cleanup: 
-  #   docker:
-  #     - image: cimg/base:stable
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # install AWS CLI
-  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  #           unzip awscliv2.zip
-  #           sudo ./aws/install
-  #     - run:
-  #         name: Remove old stacks and files
-  #         command: |
-  #           OldWorkflowID=$(cat ~/OldWorkflowID.txt)
-  #           echo OldWorkflowID: "${OldWorkflowID}"
-  #           echo Current_CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
-
-  #           export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-  #           --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-  #           echo Stack names: "${STACKS[@]}"       
-            
-
-  #           if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-  #           then
-  #             echo "delete  old Env"
-  #             aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-  #             aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
-  #             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-  #           else
-  #             echo "nothing to be deleted"  
-  #           fi
-            
 ############################# WORKFLOWS ######################################
 workflows:
   default:
@@ -505,5 +482,5 @@ workflows:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - cleanup:
+          requires: [cloudfront-update]

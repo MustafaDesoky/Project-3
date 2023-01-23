@@ -198,7 +198,7 @@ jobs:
           # You can get this ID in the section where you registered the SSH Key
           fingerprints: ["d0:8e:91:0b:04:af:af:a3:4a:c5:81:ac:d4:44:05:68"]
       - attach_workspace:
-          at: ~/     
+          at: ~/  
       - run:
           name: Install Ansible
           command: |
@@ -208,6 +208,18 @@ jobs:
       - run:
           name: run Ansible
           command: |
+            echo ENVIRONMENT= production >> backend/.env
+            echo TYPEORM_CONNECTION= $TYPEORM_CONNECTION >> backend/.env
+            echo TYPEORM_ENTITIES= $TYPEORM_ENTITIES >> backend/.env
+            echo TYPEORM_HOST= $TYPEORM_HOST >> backend/.env
+            echo TYPEORM_PORT= $TYPEORM_PORT >> backend/.env
+            echo TYPEORM_USERNAME = $TYPEORM_USERNAME >> backend/.env
+            echo TYPEORM_PASSWORD= $TYPEORM_PASSWORD >> backend/.env
+            echo TYPEORM_DATABASE= $TYPEORM_DATABASE >> backend/.env
+            echo TYPEORM_MIGRATIONS= $TYPEORM_MIGRATIONS >> backend/.env
+            echo TYPEORM_MIGRATIONS_DIR= $TYPEORM_MIGRATIONS_DIR >> backend/.env
+            cat backend/.env
+            cd .circleci/ansible
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml 
       - destroy-environment:
@@ -391,8 +403,8 @@ jobs:
               exit 1
             fi
       # Here's where you will add some code to rollback on failure  
-      # - destroy-environment:
-      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations
 
   cloudfront-update:

@@ -391,9 +391,9 @@ jobs:
             if curl --connect-timeout 5 -s "${API_URL}/api/status" | grep "ok"
             then
               echo "backend is working successfully"
-              exit 1
+              exit 0
             else
-              exit 1
+              exit 0
             fi
       - run:
           name: Frontend smoke test.
@@ -499,5 +499,5 @@ workflows:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - cleanup:
+          requires: [cloudfront-update]

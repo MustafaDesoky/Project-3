@@ -223,7 +223,8 @@ jobs:
             ansible-playbook -i inventory.txt configure-server.yml 
       - persist_to_workspace:
           root: ~/
-          paths: [project/backend]       
+          paths: 
+            - project/backend    
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
           
@@ -338,10 +339,10 @@ jobs:
             sudo apt install software-properties-common -y
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y            
-      - attach_workspace:
-          at: ~/  
       - restore_cache:
-          keys: [backend-build]     
+          keys: [backend-build] 
+      - attach_workspace:
+          at: ~/      
       - run:
           name: Deploy backend
           command: |

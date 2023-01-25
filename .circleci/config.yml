@@ -469,6 +469,7 @@ jobs:
       - run:
           name: Remove old stacks
           command: |
+            export OldWorkflowID=$(curl --insecure https://kvdb.io/$KxSeKv7Tgks1jkLJeWsmua/old_workflow_id)
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
               echo old_Workflow_ID : "${OldWorkflowID}" 

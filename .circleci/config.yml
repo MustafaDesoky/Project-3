@@ -418,10 +418,10 @@ jobs:
             echo OldWorkflowID: "${OldWorkflowID}"
             # echo $OldWorkflowID > ~/OldWorkflowID.txt
             curl https://kvdb.io/$KxSeKv7Tgks1jkLJeWsmua/old_workflow_id  -d "${OldWorkflowID}"
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - OldWorkflowID.txt 
+      # - persist_to_workspace:
+      #     root: ~/
+      #     paths:
+      #       - OldWorkflowID.txt 
       - run:
           name: Update cloudfront distribution
           command: |       

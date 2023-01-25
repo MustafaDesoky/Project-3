@@ -170,12 +170,15 @@ jobs:
               --tags project=udapeople \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+
+              echo circle_ci : "${CIRCLE_WORKFLOW_ID:0:7}" 
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            IP_ADDRESS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[].Instances[].PublicIpAddress' --output text)
-            echo IP_ADDRESS= "${IP_ADDRESS}"
-            echo $IP_ADDRESS >> ./.circleci/ansible/inventory.txt
+            IP_BACKEND=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[].Instances[].PublicIpAddress' --output text)
+            echo IP_BACKEND= "${IP_BACKEND}"
+            echo $IP_BACKEND >> ./.circleci/ansible/inventory.txt
+            cat ./.circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -468,6 +471,7 @@ jobs:
           command: |
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
+              echo old_Workflow_ID : "${OldWorkflowID}" 
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
